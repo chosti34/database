@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Апр 20 2017 г., 11:10
+-- Время создания: Апр 21 2017 г., 21:14
 -- Версия сервера: 5.7.14
 -- Версия PHP: 5.6.25
 
@@ -19,8 +19,6 @@ SET time_zone = "+00:00";
 --
 -- База данных: `apartments`
 --
-CREATE DATABASE IF NOT EXISTS `apartments` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `apartments`;
 
 -- --------------------------------------------------------
 
@@ -31,111 +29,136 @@ USE `apartments`;
 CREATE TABLE `apartment` (
   `id_apartment` int(11) NOT NULL,
   `address` varchar(255) NOT NULL,
-  `rooms_count` int(11) NOT NULL,
-  `area` int(11) NOT NULL,
-  `price` int(11) NOT NULL
+  `price` int(11) NOT NULL,
+  `rooms_count` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `apartment`
 --
 
-INSERT INTO `apartment` (`id_apartment`, `address`, `rooms_count`, `area`, `price`) VALUES
-(1, 'г. Казань, ул. Четаева, 27А, 34', 3, 80, 3400000),
-(2, 'г. Йошкар-Ола, ул. Успенская, 198А, 71', 4, 100, 5100000),
-(3, 'г. Йошкар-Ола, Ленинский пр., 54А, 8', 3, 70, 4500000);
+INSERT INTO `apartment` (`id_apartment`, `address`, `price`, `rooms_count`) VALUES
+(1, 'село Вятское, ул. Новикова, дом 3, кв. 34', 1200000, 3),
+(2, 'г. Йошкар-Ола, ул. Панфилова, д. 36', 2300000, 2),
+(3, 'г. Козьмодемьянск, ул. Гагарина, д. 6', 4000000, 4),
+(4, 'с. Оршанка, ул. Рябинина, д. 5', 2500000, 3),
+(5, 'п. Советский, ул. Пушкина', 1900000, 3),
+(6, 'г. Йошкар-Ола, ул. Строителей, д. 34', 3100000, 4);
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `apartment_in_communal_service`
+-- Структура таблицы `bill`
 --
 
-CREATE TABLE `apartment_in_communal_service` (
-  `id_apartment_in_communal_service` int(11) NOT NULL,
+CREATE TABLE `bill` (
+  `id_bill` int(11) NOT NULL,
+  `id_service_in_apartment` int(11) NOT NULL,
+  `id_payment` int(11) NOT NULL,
   `date` date NOT NULL,
-  `id_communal_service_payment` int(11) NOT NULL,
-  `id_communal_service` int(11) NOT NULL,
-  `id_apartment` int(11) NOT NULL
+  `price` int(11) NOT NULL,
+  `owner` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Дамп данных таблицы `apartment_in_communal_service`
+-- Дамп данных таблицы `bill`
 --
 
-INSERT INTO `apartment_in_communal_service` (`id_apartment_in_communal_service`, `date`, `id_communal_service_payment`, `id_communal_service`, `id_apartment`) VALUES
-(1, '2017-04-05', 1, 1, 2),
-(2, '2017-04-07', 1, 4, 1),
-(3, '2017-04-10', 1, 3, 3);
+INSERT INTO `bill` (`id_bill`, `id_service_in_apartment`, `id_payment`, `date`, `price`, `owner`) VALUES
+(2, 1, 3, '2017-04-06', 3000, 'Василий'),
+(3, 3, 2, '2017-04-20', 4000, 'Михаил'),
+(4, 3, 3, '2017-04-09', 5000, 'Иван');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `communal_payment_tariff`
+-- Структура таблицы `payment`
 --
 
-CREATE TABLE `communal_payment_tariff` (
-  `id_communal_payment_tariff` int(11) NOT NULL,
+CREATE TABLE `payment` (
+  `id_payment` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `payment`
+--
+
+INSERT INTO `payment` (`id_payment`, `date`, `price`) VALUES
+(2, '2017-04-05', 3000),
+(3, '2017-04-12', 5000),
+(4, '2017-04-17', 10000);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `service`
+--
+
+CREATE TABLE `service` (
+  `id_service` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `price` int(11) NOT NULL,
-  `service_count` int(11) NOT NULL
+  `provider` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Дамп данных таблицы `communal_payment_tariff`
+-- Дамп данных таблицы `service`
 --
 
-INSERT INTO `communal_payment_tariff` (`id_communal_payment_tariff`, `name`, `description`, `price`, `service_count`) VALUES
-(1, 'Водоснабжение+', 'Повышенная поставка воды', 3000, 4),
-(2, 'Газоснабжение+', 'Повышенная поставка газа', 4000, 2);
+INSERT INTO `service` (`id_service`, `name`, `description`, `provider`) VALUES
+(1, 'Газ', 'Поставка газа в дом', 'ОАО "Газораспределение"'),
+(2, 'Теплоснабжение', 'Поставка тепла в дом', 'ТЭЦ'),
+(3, 'Электроэнергия', 'Поставка электроэнергии в дом', 'ГЭС');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `communal_service`
+-- Структура таблицы `service_in_apartment`
 --
 
-CREATE TABLE `communal_service` (
-  `id_communal_service` int(11) NOT NULL,
+CREATE TABLE `service_in_apartment` (
+  `id_service_in_apartment` int(11) NOT NULL,
+  `id_apartment` int(11) NOT NULL,
+  `id_tariff_service` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `service_no` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `service_in_apartment`
+--
+
+INSERT INTO `service_in_apartment` (`id_service_in_apartment`, `id_apartment`, `id_tariff_service`, `date`, `service_no`) VALUES
+(1, 1, 4, '2017-04-06', 4),
+(2, 2, 2, '2017-04-06', 6),
+(3, 4, 5, '2017-04-19', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `tariff_service`
+--
+
+CREATE TABLE `tariff_service` (
+  `id_tariff_service` int(11) NOT NULL,
+  `id_service` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `provider` varchar(255) NOT NULL,
-  `id_communal_payment_tariff` int(11) NOT NULL
+  `description` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Дамп данных таблицы `communal_service`
+-- Дамп данных таблицы `tariff_service`
 --
 
-INSERT INTO `communal_service` (`id_communal_service`, `name`, `provider`, `id_communal_payment_tariff`) VALUES
-(1, 'Поставка газа', 'ТЭЦ №2', 2),
-(2, 'Поставка воды', 'ТЭЦ №2', 1),
-(3, 'Поставка электроэнергии', 'ТЭЦ №3', 1),
-(4, 'Теплоснабжение', 'ОАО "Марбиофарм"', 1),
-(5, 'Поставка электроэнергии', 'ГЭС №1', 2);
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `communal_service_payment`
---
-
-CREATE TABLE `communal_service_payment` (
-  `id_communal_service_payment` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
-  `payer` varchar(255) NOT NULL,
-  `seller` varchar(255) NOT NULL,
-  `date` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `communal_service_payment`
---
-
-INSERT INTO `communal_service_payment` (`id_communal_service_payment`, `price`, `payer`, `seller`, `date`) VALUES
-(1, 10000, 'Василий', 'ЖКХ г. Йошкар-Ола', '2017-04-18'),
-(2, 15000, 'Михаил', 'ЖКХ г. Казань', '2017-04-04'),
-(3, 7000, 'Евгений', 'ЖКХ г. Йошкар-Ола', '2017-04-08');
+INSERT INTO `tariff_service` (`id_tariff_service`, `id_service`, `name`, `description`) VALUES
+(1, 1, 'Газ Город', 'Поставка газа с учётом городской обстановки'),
+(2, 2, 'Тепло Город', 'Поставка тепла с учётом городской обстановки'),
+(3, 3, 'Электроэнергия Город', 'Поставка электроэнергии с учётом городской обстановки'),
+(4, 1, 'Газ Посёлок', 'Поставка газа с учётом обстановки в посёлке'),
+(5, 2, 'Тепло Посёлок', 'Поставка тепла с учётом обстановки в посёлке'),
+(6, 3, 'Электроэнергия Посёлок', 'Поставка электроэнергии с учётом обстановки в посёлке');
 
 --
 -- Индексы сохранённых таблиц
@@ -148,32 +171,39 @@ ALTER TABLE `apartment`
   ADD PRIMARY KEY (`id_apartment`);
 
 --
--- Индексы таблицы `apartment_in_communal_service`
+-- Индексы таблицы `bill`
 --
-ALTER TABLE `apartment_in_communal_service`
-  ADD PRIMARY KEY (`id_apartment_in_communal_service`),
-  ADD KEY `id_communal_service_payment` (`id_communal_service_payment`),
-  ADD KEY `id_communal_service` (`id_communal_service`),
-  ADD KEY `id_apartment` (`id_apartment`);
+ALTER TABLE `bill`
+  ADD PRIMARY KEY (`id_bill`),
+  ADD KEY `id_service_in_apartment` (`id_service_in_apartment`),
+  ADD KEY `id_payment` (`id_payment`);
 
 --
--- Индексы таблицы `communal_payment_tariff`
+-- Индексы таблицы `payment`
 --
-ALTER TABLE `communal_payment_tariff`
-  ADD PRIMARY KEY (`id_communal_payment_tariff`);
+ALTER TABLE `payment`
+  ADD PRIMARY KEY (`id_payment`);
 
 --
--- Индексы таблицы `communal_service`
+-- Индексы таблицы `service`
 --
-ALTER TABLE `communal_service`
-  ADD PRIMARY KEY (`id_communal_service`),
-  ADD KEY `id_communal_payment_tariff` (`id_communal_payment_tariff`);
+ALTER TABLE `service`
+  ADD PRIMARY KEY (`id_service`);
 
 --
--- Индексы таблицы `communal_service_payment`
+-- Индексы таблицы `service_in_apartment`
 --
-ALTER TABLE `communal_service_payment`
-  ADD PRIMARY KEY (`id_communal_service_payment`);
+ALTER TABLE `service_in_apartment`
+  ADD PRIMARY KEY (`id_service_in_apartment`),
+  ADD KEY `id_apartment` (`id_apartment`),
+  ADD KEY `id_tariff_service` (`id_tariff_service`);
+
+--
+-- Индексы таблицы `tariff_service`
+--
+ALTER TABLE `tariff_service`
+  ADD PRIMARY KEY (`id_tariff_service`),
+  ADD KEY `id_service` (`id_service`);
 
 --
 -- AUTO_INCREMENT для сохранённых таблиц
@@ -183,44 +213,55 @@ ALTER TABLE `communal_service_payment`
 -- AUTO_INCREMENT для таблицы `apartment`
 --
 ALTER TABLE `apartment`
-  MODIFY `id_apartment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_apartment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
--- AUTO_INCREMENT для таблицы `apartment_in_communal_service`
+-- AUTO_INCREMENT для таблицы `bill`
 --
-ALTER TABLE `apartment_in_communal_service`
-  MODIFY `id_apartment_in_communal_service` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `bill`
+  MODIFY `id_bill` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
--- AUTO_INCREMENT для таблицы `communal_payment_tariff`
+-- AUTO_INCREMENT для таблицы `payment`
 --
-ALTER TABLE `communal_payment_tariff`
-  MODIFY `id_communal_payment_tariff` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `payment`
+  MODIFY `id_payment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
--- AUTO_INCREMENT для таблицы `communal_service`
+-- AUTO_INCREMENT для таблицы `service`
 --
-ALTER TABLE `communal_service`
-  MODIFY `id_communal_service` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+ALTER TABLE `service`
+  MODIFY `id_service` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
--- AUTO_INCREMENT для таблицы `communal_service_payment`
+-- AUTO_INCREMENT для таблицы `service_in_apartment`
 --
-ALTER TABLE `communal_service_payment`
-  MODIFY `id_communal_service_payment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `service_in_apartment`
+  MODIFY `id_service_in_apartment` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- AUTO_INCREMENT для таблицы `tariff_service`
+--
+ALTER TABLE `tariff_service`
+  MODIFY `id_tariff_service` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Ограничения внешнего ключа таблицы `apartment_in_communal_service`
+-- Ограничения внешнего ключа таблицы `bill`
 --
-ALTER TABLE `apartment_in_communal_service`
-  ADD CONSTRAINT `apartment_in_communal_service_ibfk_1` FOREIGN KEY (`id_apartment`) REFERENCES `apartment` (`id_apartment`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `apartment_in_communal_service_ibfk_2` FOREIGN KEY (`id_communal_service_payment`) REFERENCES `communal_service_payment` (`id_communal_service_payment`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `apartment_in_communal_service_ibfk_3` FOREIGN KEY (`id_communal_service`) REFERENCES `communal_service` (`id_communal_service`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `bill`
+  ADD CONSTRAINT `bill_ibfk_1` FOREIGN KEY (`id_service_in_apartment`) REFERENCES `service_in_apartment` (`id_service_in_apartment`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `bill_ibfk_2` FOREIGN KEY (`id_payment`) REFERENCES `payment` (`id_payment`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `communal_service`
+-- Ограничения внешнего ключа таблицы `service_in_apartment`
 --
-ALTER TABLE `communal_service`
-  ADD CONSTRAINT `communal_service_ibfk_2` FOREIGN KEY (`id_communal_payment_tariff`) REFERENCES `communal_payment_tariff` (`id_communal_payment_tariff`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `service_in_apartment`
+  ADD CONSTRAINT `service_in_apartment_ibfk_1` FOREIGN KEY (`id_apartment`) REFERENCES `apartment` (`id_apartment`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `service_in_apartment_ibfk_2` FOREIGN KEY (`id_tariff_service`) REFERENCES `tariff_service` (`id_tariff_service`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `tariff_service`
+--
+ALTER TABLE `tariff_service`
+  ADD CONSTRAINT `tariff_service_ibfk_1` FOREIGN KEY (`id_service`) REFERENCES `service` (`id_service`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
