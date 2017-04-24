@@ -18,7 +18,7 @@ SELECT * FROM `service` WHERE `provider` IS NOT NULL;
 SELECT * FROM `apartment` WHERE `area` BETWEEN 70 AND 80;
 
 -- 2.4 IN --
--- получить все совершённые оплаты, где сумма равна одному из значений внутри оператора IN --
+-- получить все совершённые оплаты, где сумма платежа равна одному из значений внутри оператора IN --
 SELECT * FROM `payment` WHERE `price` IN(10000, 7000, 5000);
 
 -- 2.5 = --
@@ -40,8 +40,9 @@ SELECT * FROM `apartment` ORDER BY `price` ASC;
 SELECT * FROM `apartment` ORDER BY `price` DESC;
 
 -- 3.3 по двум аттрибутам --
--- получить все тарифы ком. платежей так, чтобы они были отсортированы по имени по убыванию и по цене по возрастанию
-SELECT * FROM `tariff_service` ORDER BY `name` DESC, `price` ASC;
+-- получить все тарифы услуг так, чтобы они были отсортированы по цене по убыванию, и,
+-- если цены одинаковы сортировать по имени по возрастанию
+SELECT * FROM `tariff_service` ORDER BY `price` DESC, `name` ASC;
 
 -- 3.4 по первому аттрибуту, из списка извлекаемых --
 -- получить все квартиры отсортированные по первому полю (id) по убыванию --
@@ -68,25 +69,25 @@ SELECT SUM(`price`) FROM `payment`;
 -- 5.* DISTINCT, COUNT --
 
 -- 5.1 DISTINCT --
--- получить всех поставищиков коммунальных услуг без повторений --
-SELECT DISTINCT `provider` FROM `service`;
+-- получить всех владельцев квартир которые работают на разных работах (должностях) --
+SELECT DISTINCT `job` FROM `apartment_owner`;
 
 -- 5.2 COUNT(DISTINCT) --
--- получить кол-во всех поставщиков услуг без повторений --
-SELECT COUNT(DISTINCT `provider`) AS ProvidersAmount FROM `service`;
+-- получить кол-во всех владельцев квартир которые работают на разных работах (должностях) --
+SELECT COUNT(DISTINCT `job`) FROM `apartment_owner`;
 
 -- 6.* GROUP BY --
 
 -- 6.1 SUM GROUP BY --
--- получить сгруппированные записи квартир по кол-ву комнат и сумму за все квартиры с одинаковым кол-вом комнат
-SELECT `rooms_count`, SUM(`price`) FROM `apartment` GROUP BY `rooms_count`;
+-- получить средние цены за квартиры с определённым кол-вом комнат
+SELECT `rooms_count`, AVG(`price`) FROM `apartment` GROUP BY `rooms_count`;
 
 -- 6.2 SUM WHERE GROUP BY
--- получить сгруппированные записи квартир по кол-ву комнат и сумму за все квартиры с одинаковым кол-вом комнат,
+-- получить средние цены за квартиры с определённым кол-вом комнат,
 -- игнорируя квартиры с площадью >= 90 (кв. м.)
-SELECT `rooms_count`, SUM(`price`) FROM `apartment` WHERE `area` < 90 GROUP BY `rooms_count`;
+SELECT `rooms_count`, AVG(`price`) FROM `apartment` WHERE `area` < 90 GROUP BY `rooms_count`;
 
 -- 6.3 SUM GROUP BY HAVING --
--- получить сгруппированные записи квартир по кол-ву комнат и сумму за все квартиры с одинаковым кол-вом комнат,
--- такие, что сумма будет больше 5000000 (HAVING применяется после группировки)
-SELECT `rooms_count`, SUM(`price`) FROM `apartment` GROUP BY `rooms_count` HAVING SUM(`price`) > 5000000;
+-- получить средние цены за квартиры с определённым кол-вом комнат,
+-- такие, что цена будет больше 2000000 (HAVING применяется после группировки)
+SELECT `rooms_count`, AVG(`price`) FROM `apartment` GROUP BY `rooms_count` HAVING AVG(`price`) > 2000000;
