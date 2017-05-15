@@ -1,0 +1,2 @@
+id	select_type	table	partitions	type	possible_keys	key	key_len	ref	rows	filtered	Extra
+1	SIMPLE	client	NULL	ref	age_name_idx	age_name_idx	4	const	469	100.00	NULL
